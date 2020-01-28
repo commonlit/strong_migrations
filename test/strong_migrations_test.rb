@@ -519,8 +519,13 @@ class StrongMigrationsTest < Minitest::Test
 
     migrate CheckTimeouts
 
-    assert_equal 3600, $statement_timeout
-    assert_equal 10, $lock_timeout
+    if postgresql?
+      assert_equal "1h", $statement_timeout
+      assert_equal "10s", $lock_timeout
+    else
+      assert_equal 3600, $statement_timeout
+      assert_equal 10, $lock_timeout
+    end
   ensure
     StrongMigrations.statement_timeout = nil
     StrongMigrations.lock_timeout = nil
